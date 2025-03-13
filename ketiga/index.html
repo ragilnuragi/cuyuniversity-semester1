@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sesi 5-Local Storage</title>
+  </head>
+  <style>
+    #root {
+      background-color: aqua;
+      color: aliceblue;
+      font-size: 2em;
+      text-align: center;
+      height: 100vh;
+    }
+  </style>
+  <body>
+    <!-- Konten -->
+    <div id="root">
+      <input placeholder="username" type="text" name="" id="usernameInput" />
+      <input placeholder="password" type="password" name="" id="passwordInput" />
+      <button id="loginButton" onclick="onLogin()">Login</button>
+      <button id="logoutButton" onclick="onLogout()">Logout</button>
+      <button id="registerButton" onclick="onRegister()">Register</button>
+      <br />
+
+      <h1 id="admin">Login sebagai Admin</h1>
+      <h1 id="biasa">Login sebagai akun biasa</h1>
+    </div>
+
+    <script type="application/javascript">
+      let usernameInput = document.getElementById("usernameInput");
+      let passwordInput = document.getElementById("passwordInput");
+      let loginButton = document.getElementById("loginButton");
+      let logoutButton = document.getElementById("logoutButton");
+      let registerButton = document.getElementById("registerButton");
+      let admin = document.getElementById("admin");
+      let biasa = document.getElementById("biasa");
+
+      admin.style.display = "none";
+      biasa.style.display = "none";
+      logoutButton.style.display = "none";
+
+      function onRegister() {
+        let username = usernameInput.value.trim();
+        let password = passwordInput.value.trim();
+
+        if (username === "" || password === "") {
+          alert("Username dan Password harus diisi!");
+          return;
+        }
+
+        if (localStorage.getItem(username)) {
+          alert("Username sudah terdaftar!");
+          return;
+        }
+
+        localStorage.setItem(username, password);
+        alert("Registrasi berhasil!");
+        usernameInput.value = "";
+        passwordInput.value = "";
+      }
+
+      function onLogin() {
+        let username = usernameInput.value.trim();
+        let password = passwordInput.value.trim();
+
+        if (username === "" || password === "") {
+          alert("Username dan Password harus diisi!");
+          return;
+        }
+
+        // Cek jika login sebagai admin
+        if (username === "admin" && password === "admin") {
+          localStorage.setItem("username", "admin");
+          localStorage.setItem("role", "admin");
+          showLoggedInView("admin");
+          return;
+        }
+
+        // Cek user yang sudah terdaftar di Local Storage
+        let storedPassword = localStorage.getItem(username);
+        if (storedPassword !== password) {
+          alert("Username atau Password salah!");
+          return;
+        }
+
+        localStorage.setItem("username", username);
+        localStorage.setItem("role", "biasa");
+        showLoggedInView("biasa");
+      }
+
+      function onLogout() {
+        localStorage.removeItem("username");
+        localStorage.removeItem("role");
+        location.reload();
+      }
+
+      function showLoggedInView(role) {
+        usernameInput.style.display = "none";
+        passwordInput.style.display = "none";
+        loginButton.style.display = "none";
+        registerButton.style.display = "none";
+        logoutButton.style.display = "block";
+
+        if (role === "admin") {
+          admin.style.display = "block";
+          biasa.style.display = "none";
+        } else {
+          admin.style.display = "none";
+          biasa.style.display = "block";
+        }
+      }
+
+      // Cek apakah user sudah login sebelumnya
+      let loggedInUser = localStorage.getItem("username");
+      let userRole = localStorage.getItem("role");
+      if (loggedInUser) {
+        showLoggedInView(userRole);
+      }
+    </script>
+  </body>
+</html>
